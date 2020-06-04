@@ -1,3 +1,12 @@
+# Dependencies
+* GLFW for window support
+* nlohmann/json for json serialization
+* lua for lua.
+* sol2 to make it eaiser to use lua.
+* irrklang for playing audio
+* imgui for the GUI
+* glm for math
+
 # Getting Started
 
 1. Clone the repo.

@@ -5,10 +5,13 @@
 #include <imgui_impl_opengl3.h>
 #include "Opengl.h"
 #include "Serialization.h"
-#include <sol/sol.hpp>
+#include "Compiler.h"
+
+#define NAME "OpenGEC"
+#define EDITOR true
 
 static Camera camera;
-int main() {
+int WinMain() {
 
 	bool sflag = false;
 
@@ -25,7 +28,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow* m_window = glfwCreateWindow(800, 800, "OpenGEC", NULL, NULL);
+	GLFWwindow* m_window = glfwCreateWindow(1000, 1000, NAME, NULL, NULL);
 
 	if (m_window == NULL) {
 		std::cerr << "Failed to create GLFW window!" << std::endl;
@@ -46,64 +49,11 @@ int main() {
 
 	Application::Start();
 
-	sol::state lua;
-	lua.open_libraries();
+	Script script("res/main.lua");
 
-	lua.set("KEY_1", KEY_1);
-	lua.set("KEY_2", KEY_2);
-	lua.set("KEY_3", KEY_3);
-	lua.set("KEY_4", KEY_4);
-	lua.set("KEY_5", KEY_5);
-	lua.set("KEY_6", KEY_6);
-	lua.set("KEY_7", KEY_7);
-	lua.set("KEY_8", KEY_8);
-	lua.set("KEY_9", KEY_9);
-	lua.set("KEY_0", KEY_0);
+	script.Run();
 
-	lua.set("KEY_Q", KEY_Q);
-	lua.set("KEY_W", KEY_W);
-	lua.set("KEY_E", KEY_E);
-	lua.set("KEY_R", KEY_R);
-	lua.set("KEY_T", KEY_T);
-	lua.set("KEY_Y", KEY_Y);
-	lua.set("KEY_U", KEY_U);
-	lua.set("KEY_I", KEY_I);
-	lua.set("KEY_O", KEY_O);
-	lua.set("KEY_P", KEY_P);
-
-	lua.set("KEY_A", KEY_A);
-	lua.set("KEY_S", KEY_S);
-	lua.set("KEY_D", KEY_D);
-	lua.set("KEY_F", KEY_F);
-	lua.set("KEY_G", KEY_G);
-	lua.set("KEY_H", KEY_H);
-	lua.set("KEY_J", KEY_J);
-	lua.set("KEY_K", KEY_K);
-	lua.set("KEY_L", KEY_L);
-
-	lua.set("KEY_Z", KEY_Z);
-	lua.set("KEY_X", KEY_X);
-	lua.set("KEY_C", KEY_C);
-	lua.set("KEY_V", KEY_V);
-	lua.set("KEY_B", KEY_B);
-	lua.set("KEY_N", KEY_N);
-	lua.set("KEY_M", KEY_M);
-
-	lua.set("KEY_CRTL", KEY_CRTL);
-	lua.set("KEY_SHIFT", KEY_SHIFT);
-	lua.set("KEY_SPACE", KEY_SPACE);
-
-	for (auto i = quads.begin(); i != quads.end(); ++i) {
-		TexturedQuad* quad = *i;
-		lua.set(quad->getName(), quad);
-	}
-
-	lua.new_usertype<glm::vec2>("vec2", "x", &glm::vec2::x, "y", &glm::vec2::y);
-	lua.set_function("setPosition", &TexturedQuad::setPosition);
-
-	lua.script_file("res/main.lua");
-
-	lua["Start"]();
+	script.Start();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -120,7 +70,11 @@ int main() {
 		ImGui::NewFrame();
 
 		// Show GUIS
+
+
+
 		float bcol[4];
+#ifdef EDITOR
 		ImGui::Begin("Background", &show);
 
 		Color color = Binary::Deserialize();
@@ -136,8 +90,6 @@ int main() {
 		char* buf = new char(1024);
 		const GLubyte* vendor = glGetString(GL_VENDOR);
 		const GLubyte* renderer = glGetString(GL_RENDERER);
-
-
 
 		ImGui::Begin("Renderering", &show);
 		ImGui::Text("Driver:");
@@ -195,17 +147,25 @@ int main() {
 		}
 		ImGui::End();
 		SerializeObjects();
+#else
+		Color color = Binary::Deserialize();
+		bcol[0] = color.getRed();
+		bcol[1] = color.getGreen();
+		bcol[2] = color.getBlue();
+		ClearColor(bcol[0], bcol[1], bcol[2]);
+		DeserializeObjects();
+#endif // EDITOR
 
 		camera.UpdateQuads();
 
 
 
 		Application::HandleInput(m_window);
-		lua["HandleInput"](Input::CheckKey(m_window));
+		script.HandleInput(m_window);
 
 		Application::Update();
 
-		lua["Update"]();
+		script.Update();
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		for (auto i = quads.begin(); i != quads.end(); ++i) {

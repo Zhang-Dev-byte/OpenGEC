@@ -222,8 +222,8 @@ class QuadRenderer {
 public:
     //TODO: Move in seperate .h and .cpp files
     static void RenderQuad(vec2 pos,vec2 size,Color color) {
-        pos /= 800;
-        size /= 800;
+        pos /= 1000;
+        size /= 1000;
         float vertices[] = {
          pos.x + size.x,  pos.y + size.y, 0.0f,  // top right
          pos.x + size.x, pos.y - size.y, 0.0f,  // bottom right
@@ -320,9 +320,9 @@ public:
     }
     static void RenderQuad(TexturedQuad quad) {
         vec2 pos = quad.getPosition();
-        pos /= 800;
+        pos /= 1000;
         vec2 size = quad.getSize();
-        size /= 800;
+        size /= 1000;
         
         float vertices[] = {
          pos.x + size.x,  pos.y + size.y, 0.0f,  1.0f, 1.0f, 1.0f,   1.0f, 1.0f, // top right

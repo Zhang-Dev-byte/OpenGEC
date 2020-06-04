@@ -8,6 +8,9 @@
 *.vcxproj
 *.vs
 
+# CMake
+*.dir
+
 # User-specific files
 *.rsuser
 *.suo

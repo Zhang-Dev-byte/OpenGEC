@@ -6,7 +6,6 @@
 # C++
 *.sln
 *.vcxproj
-*.vs
 
 # CMake
 *.dir

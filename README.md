@@ -6,6 +6,7 @@
 * irrklang for playing audio
 * imgui for the GUI
 * glm for math
+* Glad for function loading
 
 # Getting Started
 
